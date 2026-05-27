@@ -14,15 +14,26 @@ const ProductDetails = () => {
   const dispatch = useDispatch();
 
   const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        setLoading(true);
+        setError("");
+
         const data = await getProductById(id);
 
         setProduct(data);
       } catch (error) {
         console.log(error);
+        setProduct(null);
+        setError(
+          error.response?.data?.message || "Unable to load product details.",
+        );
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -40,8 +51,12 @@ const ProductDetails = () => {
     alert("Product Added To Cart");
   };
 
-  if (!product) {
+  if (loading) {
     return <h1 className="text-center text-3xl mt-20">Loading...</h1>;
+  }
+
+  if (error) {
+    return <h1 className="text-center text-3xl mt-20">{error}</h1>;
   }
 
   return (
@@ -58,7 +73,7 @@ const ProductDetails = () => {
 
           <p className="text-gray-500 mb-5">{product.category}</p>
 
-          <p className="text-3xl font-bold mb-5">₹{product.price}</p>
+          <p className="text-3xl font-bold mb-5">Rs. {product.price}</p>
 
           <p className="mb-8 text-lg">{product.description}</p>
 

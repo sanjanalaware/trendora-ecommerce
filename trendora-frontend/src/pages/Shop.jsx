@@ -18,6 +18,7 @@ const Shop = () => {
   const [products, setProducts] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
 
@@ -31,8 +32,10 @@ const Shop = () => {
         const data = await getProducts();
 
         setProducts(data);
+        setError("");
       } catch (error) {
         console.log(error);
+        setError(error.response?.data?.message || "Unable to load products.");
       } finally {
         setLoading(false);
       }
@@ -92,6 +95,16 @@ const Shop = () => {
             Loading collection
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-[calc(100vh-88px)] items-center justify-center bg-gradient-to-br from-rose-50 via-white to-emerald-50 px-5 dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950">
+        <h1 className="text-center text-3xl font-bold text-slate-900 dark:text-white">
+          {error}
+        </h1>
       </div>
     );
   }

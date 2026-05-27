@@ -1,4 +1,7 @@
 import Product from "../models/Product.js";
+import mongoose from "mongoose";
+
+const isValidProductId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 // CREATE PRODUCT
 export const createProduct = async (req, res) => {
@@ -29,6 +32,12 @@ export const getProducts = async (req, res) => {
 // GET SINGLE PRODUCT
 export const getProductById = async (req, res) => {
   try {
+    if (!isValidProductId(req.params.id)) {
+      return res.status(400).json({
+        message: "Invalid product id",
+      });
+    }
+
     const product = await Product.findById(req.params.id);
 
     if (!product) {
@@ -48,6 +57,12 @@ export const getProductById = async (req, res) => {
 // UPDATE PRODUCT
 export const updateProduct = async (req, res) => {
   try {
+    if (!isValidProductId(req.params.id)) {
+      return res.status(400).json({
+        message: "Invalid product id",
+      });
+    }
+
     const product = await Product.findById(req.params.id);
 
     if (!product) {
@@ -56,16 +71,16 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    product.title = req.body.title || product.title;
-    product.description = req.body.description || product.description;
+    product.title = req.body.title ?? product.title;
+    product.description = req.body.description ?? product.description;
 
-    product.price = req.body.price || product.price;
+    product.price = req.body.price ?? product.price;
 
-    product.image = req.body.image || product.image;
+    product.image = req.body.image ?? product.image;
 
-    product.category = req.body.category || product.category;
+    product.category = req.body.category ?? product.category;
 
-    product.stock = req.body.stock || product.stock;
+    product.stock = req.body.stock ?? product.stock;
 
     const updatedProduct = await product.save();
 
@@ -80,6 +95,12 @@ export const updateProduct = async (req, res) => {
 // DELETE PRODUCT
 export const deleteProduct = async (req, res) => {
   try {
+    if (!isValidProductId(req.params.id)) {
+      return res.status(400).json({
+        message: "Invalid product id",
+      });
+    }
+
     const product = await Product.findById(req.params.id);
 
     if (!product) {
