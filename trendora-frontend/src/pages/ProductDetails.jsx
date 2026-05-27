@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 import { useParams } from "react-router-dom";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import { addToCart } from "../redux/slices/cartSlice";
+import { addCartItem } from "../redux/slices/cartSlice";
 
 import { getProductById } from "../services/productService";
 
@@ -12,6 +12,7 @@ const ProductDetails = () => {
   const { id } = useParams();
 
   const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,15 +41,25 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
-  const addToCartHandler = () => {
-    dispatch(
-      addToCart({
-        ...product,
-        qty: 1,
-      }),
-    );
+  const addToCartHandler = async () => {
+    if (!userInfo?.token) {
+      alert("Please login to add items to your cart.");
+      return;
+    }
 
-    alert("Product Added To Cart");
+    try {
+      await dispatch(
+        addCartItem({
+          productId: product._id,
+          qty: 1,
+          token: userInfo.token,
+        }),
+      ).unwrap();
+
+      alert("Product Added To Cart");
+    } catch (error) {
+      alert(error || "Unable to add item to cart.");
+    }
   };
 
   if (loading) {

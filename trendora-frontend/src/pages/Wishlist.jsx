@@ -8,21 +8,38 @@ import {
   FaTrash,
 } from "react-icons/fa";
 
-import { addToCart } from "../redux/slices/cartSlice";
+import { addCartItem } from "../redux/slices/cartSlice";
 import { removeFromWishlist } from "../redux/slices/wishlistSlice";
 
 const Wishlist = () => {
   const dispatch = useDispatch();
 
   const { wishlistItems } = useSelector((state) => state.wishlist);
+  const { userInfo } = useSelector((state) => state.auth);
 
   const removeHandler = (id) => {
     dispatch(removeFromWishlist(id));
   };
 
-  const moveToCartHandler = (item) => {
-    dispatch(addToCart({ ...item, qty: item.qty || 1 }));
-    dispatch(removeFromWishlist(item._id));
+  const moveToCartHandler = async (item) => {
+    if (!userInfo?.token) {
+      alert("Please login to move items to your cart.");
+      return;
+    }
+
+    try {
+      await dispatch(
+        addCartItem({
+          productId: item._id,
+          qty: item.qty || 1,
+          token: userInfo.token,
+        }),
+      ).unwrap();
+
+      dispatch(removeFromWishlist(item._id));
+    } catch (error) {
+      alert(error || "Unable to move item to cart.");
+    }
   };
 
   return (
