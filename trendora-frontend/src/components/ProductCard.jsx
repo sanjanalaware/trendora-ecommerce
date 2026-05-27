@@ -1,8 +1,17 @@
 import { Link } from "react-router-dom";
 
 import { FaArrowRight, FaHeart } from "react-icons/fa";
+import { addToWishlist } from "../redux/slices/wishlistSlice";
+import { useDispatch } from "react-redux";
 
 const ProductCard = ({ product }) => {
+  const dispatch = useDispatch();
+
+  const wishlistHandler = () => {
+    dispatch(addToWishlist(product));
+
+    alert("Added To Wishlist");
+  };
   return (
     <div className="group overflow-hidden rounded-2xl border border-white/80 bg-white shadow-xl shadow-rose-100/70 transition duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-rose-200/80 dark:border-slate-700 dark:bg-slate-900 dark:shadow-slate-950">
       <div className="relative overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -16,6 +25,7 @@ const ProductCard = ({ product }) => {
           type="button"
           className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-rose-600 shadow-md transition hover:bg-rose-600 hover:text-white dark:bg-slate-950/90 dark:text-rose-300 dark:hover:bg-rose-600 dark:hover:text-white"
           aria-label="Add to wishlist"
+          onClick={wishlistHandler}
         >
           <FaHeart />
         </button>
