@@ -21,6 +21,9 @@ const Navbar = ({ isDarkMode, onToggleTheme }) => {
         </Link>
 
         <div className="flex flex-wrap items-center gap-2">
+          <NavLink to="/" className={linkClass}>
+            Home
+          </NavLink>
           <NavLink to="/shop" className={linkClass}>
             Shop
           </NavLink>
