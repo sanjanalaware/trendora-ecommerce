@@ -1,16 +1,31 @@
 import { Link } from "react-router-dom";
 
 import { FaArrowRight, FaHeart } from "react-icons/fa";
-import { addToWishlist } from "../redux/slices/wishlistSlice";
-import { useDispatch } from "react-redux";
+import { addWishlistItem } from "../redux/slices/wishlistSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
+  const { userInfo } = useSelector((state) => state.auth);
 
-  const wishlistHandler = () => {
-    dispatch(addToWishlist(product));
+  const wishlistHandler = async () => {
+    if (!userInfo?.token) {
+      alert("Please login to add items to your wishlist.");
+      return;
+    }
 
-    alert("Added To Wishlist");
+    try {
+      await dispatch(
+        addWishlistItem({
+          productId: product._id,
+          token: userInfo.token,
+        }),
+      ).unwrap();
+
+      alert("Added To Wishlist");
+    } catch (error) {
+      alert(error || "Unable to add item to wishlist.");
+    }
   };
   return (
     <div className="group overflow-hidden rounded-2xl border border-white/80 bg-white shadow-xl shadow-rose-100/70 transition duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-rose-200/80 dark:border-slate-700 dark:bg-slate-900 dark:shadow-slate-950">
