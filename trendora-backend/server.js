@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://trendora-ecommerce-teal.vercel.app/",
+      "https://trendora-ecommerce-teal.vercel.app",
     ],
     credentials: true,
   }),
