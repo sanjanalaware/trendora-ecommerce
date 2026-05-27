@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 import { loginUser } from "../services/authService";
 
@@ -37,9 +38,10 @@ const Login = () => {
 
       dispatch(setCredentials(data));
 
+      toast.success("Logged in successfully.");
       navigate("/");
     } catch (error) {
-      alert(error.response?.data?.message || "Invalid credentials");
+      toast.error(error.response?.data?.message || "Invalid credentials.");
     }
   };
 

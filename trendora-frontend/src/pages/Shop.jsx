@@ -34,7 +34,6 @@ const Shop = () => {
         setProducts(data);
         setError("");
       } catch (error) {
-        console.log(error);
         setError(error.response?.data?.message || "Unable to load products.");
       } finally {
         setLoading(false);

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { FaEdit, FaTrash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 import { getProducts } from "../services/productService";
 
@@ -14,7 +15,9 @@ const AdminDashboard = () => {
 
         setProducts(data);
       } catch (error) {
-        console.log(error);
+        toast.error(
+          error.response?.data?.message || "Unable to load admin products.",
+        );
       }
     };
 

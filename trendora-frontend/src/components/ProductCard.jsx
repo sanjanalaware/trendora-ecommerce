@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import { FaArrowRight, FaHeart } from "react-icons/fa";
+import toast from "react-hot-toast";
 import { addWishlistItem } from "../redux/slices/wishlistSlice";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -10,7 +11,7 @@ const ProductCard = ({ product }) => {
 
   const wishlistHandler = async () => {
     if (!userInfo?.token) {
-      alert("Please login to add items to your wishlist.");
+      toast.error("Please login to add items to your wishlist.");
       return;
     }
 
@@ -22,9 +23,9 @@ const ProductCard = ({ product }) => {
         }),
       ).unwrap();
 
-      alert("Added To Wishlist");
+      toast.success("Added to wishlist.");
     } catch (error) {
-      alert(error || "Unable to add item to wishlist.");
+      toast.error(error || "Unable to add item to wishlist.");
     }
   };
   return (

@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { FaArrowLeft, FaLock, FaShoppingBag, FaTrash } from "react-icons/fa";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 import { fetchCart, deleteCartItem } from "../redux/slices/cartSlice";
 
@@ -34,18 +35,24 @@ const Cart = () => {
     }
   }, [dispatch, userInfo]);
 
-  const removeHandler = (id) => {
+  const removeHandler = async (id) => {
     if (!userInfo?.token) {
-      alert("Please login to manage your cart.");
+      toast.error("Please login to manage your cart.");
       return;
     }
 
-    dispatch(
-      deleteCartItem({
-        id,
-        token: userInfo.token,
-      }),
-    );
+    try {
+      await dispatch(
+        deleteCartItem({
+          id,
+          token: userInfo.token,
+        }),
+      ).unwrap();
+
+      toast.success("Removed from cart.");
+    } catch (error) {
+      toast.error(error || "Unable to remove item from cart.");
+    }
   };
 
   const totalPrice = cartItems.reduce(

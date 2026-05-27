@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import { Toaster } from "react-hot-toast";
 import { Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -42,6 +43,29 @@ function App() {
 
   return (
     <div className="min-h-screen bg-orange-50 text-slate-950 transition-colors dark:bg-slate-950 dark:text-slate-100">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            borderRadius: "12px",
+            fontWeight: 600,
+          },
+          success: {
+            iconTheme: {
+              primary: "#16a34a",
+              secondary: "#ffffff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#e11d48",
+              secondary: "#ffffff",
+            },
+          },
+        }}
+      />
+
       <Navbar isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
 
       <Routes>

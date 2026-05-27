@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useDispatch, useSelector } from "react-redux";
+import toast from "react-hot-toast";
 
 import { addCartItem } from "../redux/slices/cartSlice";
 
@@ -24,11 +25,10 @@ const ProductDetails = () => {
         setLoading(true);
         setError("");
 
-        const data = await getProductById(id);
+      const data = await getProductById(id);
 
-        setProduct(data);
-      } catch (error) {
-        console.log(error);
+      setProduct(data);
+    } catch (error) {
         setProduct(null);
         setError(
           error.response?.data?.message || "Unable to load product details.",
@@ -43,7 +43,7 @@ const ProductDetails = () => {
 
   const addToCartHandler = async () => {
     if (!userInfo?.token) {
-      alert("Please login to add items to your cart.");
+      toast.error("Please login to add items to your cart.");
       return;
     }
 
@@ -56,9 +56,9 @@ const ProductDetails = () => {
         }),
       ).unwrap();
 
-      alert("Product Added To Cart");
+      toast.success("Product added to cart.");
     } catch (error) {
-      alert(error || "Unable to add item to cart.");
+      toast.error(error || "Unable to add item to cart.");
     }
   };
 

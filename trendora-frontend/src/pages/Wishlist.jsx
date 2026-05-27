@@ -1,6 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
+import toast from "react-hot-toast";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -46,7 +47,7 @@ const Wishlist = () => {
 
   const removeHandler = async (id) => {
     if (!userInfo?.token) {
-      alert("Please login to manage your wishlist.");
+      toast.error("Please login to manage your wishlist.");
       return;
     }
 
@@ -57,14 +58,15 @@ const Wishlist = () => {
           token: userInfo.token,
         }),
       ).unwrap();
+      toast.success("Removed from wishlist.");
     } catch (error) {
-      alert(error || "Unable to remove item from wishlist.");
+      toast.error(error || "Unable to remove item from wishlist.");
     }
   };
 
   const moveToCartHandler = async (item) => {
     if (!userInfo?.token) {
-      alert("Please login to move items to your cart.");
+      toast.error("Please login to move items to your cart.");
       return;
     }
 
@@ -83,8 +85,9 @@ const Wishlist = () => {
           token: userInfo.token,
         }),
       ).unwrap();
+      toast.success("Moved to cart.");
     } catch (error) {
-      alert(error || "Unable to move item to cart.");
+      toast.error(error || "Unable to move item to cart.");
     }
   };
 

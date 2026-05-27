@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 import { registerUser } from "../services/authService";
 
@@ -38,18 +39,17 @@ const Register = () => {
 
       dispatch(setCredentials(data));
 
+      toast.success("Account created successfully.");
       navigate("/");
     } catch (error) {
-      console.log(error);
-
       if (!error.response) {
-        alert(
+        toast.error(
           "Cannot connect to the backend API. Make sure the backend server and MongoDB are running.",
         );
         return;
       }
 
-      alert(error.response.data?.message || "Something went wrong");
+      toast.error(error.response.data?.message || "Something went wrong.");
     }
   };
 
