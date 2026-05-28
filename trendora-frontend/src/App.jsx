@@ -12,6 +12,7 @@ import Register from "./pages/Register";
 import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -20,7 +21,7 @@ import AddProduct from "./pages/admin/AddProduct";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminRoute from "./components/admin/AdminRoute";
-
+import MyOrders from "./pages/MyOrders";
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -107,8 +108,10 @@ function App() {
 
         <Route path="/cart" element={<Cart />} />
 
-        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/checkout" element={<Checkout />} />
 
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/my-orders" element={<MyOrders />} />
         <Route
           path="/admin"
           element={

@@ -20,6 +20,7 @@ const navLinks = [
   { label: "Shop", to: "/shop" },
   { label: "Cart", to: "/cart" },
   { label: "Wishlist", to: "/wishlist" },
+  { label: "My Orders", to: "/my-orders" },
 ];
 
 const Navbar = ({ isDarkMode, onToggleTheme }) => {
