@@ -28,12 +28,7 @@ const quickLinks = [
   { label: "Wishlist", to: "/wishlist" },
 ];
 
-const supportLinks = [
-  "Contact Us",
-  "FAQs",
-  "Shipping Policy",
-  "Return Policy",
-];
+const supportLinks = ["Contact Us", "FAQs", "Shipping Policy", "Return Policy"];
 
 const Footer = () => {
   const [email, setEmail] = useState("");
@@ -165,15 +160,11 @@ const Footer = () => {
             <div className="mt-6 space-y-4 text-sm text-slate-400">
               <p className="flex items-center gap-3">
                 <FaMapMarkerAlt className="text-rose-400" />
-                New Delhi, India
+                Hadapsar pune, India
               </p>
               <p className="flex items-center gap-3">
                 <FaEnvelope className="text-rose-400" />
                 support@trendora.com
-              </p>
-              <p className="flex items-center gap-3">
-                <FaPhoneAlt className="text-rose-400" />
-                +91 98765 43210
               </p>
             </div>
           </div>

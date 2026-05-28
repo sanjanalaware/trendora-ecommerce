@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Toaster } from "react-hot-toast";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 
 import Footer from "./components/Footer";
 import Navbar from "./components/Navbar";
@@ -15,6 +15,16 @@ import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname]);
+
+  return null;
+};
 
 function App() {
   const [theme, setTheme] = useState(() => {
@@ -66,6 +76,7 @@ function App() {
       />
 
       <Navbar isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
+      <ScrollToTop />
 
       <Routes>
         <Route path="/" element={<Home />} />
