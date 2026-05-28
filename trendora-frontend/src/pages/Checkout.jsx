@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   FaArrowLeft,
@@ -14,12 +14,19 @@ import {
 import toast from "react-hot-toast";
 
 import { createOrder } from "../services/orderService";
+import { deleteCartItem } from "../redux/slices/cartSlice";
 
-const getCheckoutItemFromStorage = () => {
+const getCheckoutDataFromStorage = () => {
   try {
+    const data = sessionStorage.getItem("checkoutData");
+
+    if (data) {
+      return JSON.parse(data);
+    }
+
     const item = sessionStorage.getItem("checkoutItem");
 
-    return item ? JSON.parse(item) : null;
+    return item ? { source: "buy-now", items: [JSON.parse(item)] } : null;
   } catch {
     return null;
   }
@@ -28,13 +35,19 @@ const getCheckoutItemFromStorage = () => {
 const Checkout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { userInfo } = useSelector((state) => state.auth);
 
-  const [checkoutItem] = useState(
-    location.state?.checkoutItem || getCheckoutItemFromStorage(),
+  const [checkoutData] = useState(
+    location.state?.checkoutData ||
+      (location.state?.checkoutItem
+        ? { source: "buy-now", items: [location.state.checkoutItem] }
+        : getCheckoutDataFromStorage()),
   );
   const [placingOrder, setPlacingOrder] = useState(false);
   const [order, setOrder] = useState(null);
+  const checkoutItems = useMemo(() => checkoutData?.items || [], [checkoutData]);
+  const isCartCheckout = checkoutData?.source === "cart";
 
   useEffect(() => {
     if (!userInfo?.token) {
@@ -43,14 +56,28 @@ const Checkout = () => {
       return;
     }
 
-    if (!checkoutItem) {
-      toast.error("No product selected for checkout.");
+    if (checkoutItems.length === 0) {
+      toast.error("No items selected for checkout.");
       navigate("/shop", { replace: true });
     }
-  }, [checkoutItem, navigate, userInfo]);
+  }, [checkoutItems.length, navigate, userInfo]);
 
   useEffect(() => {
+    if (location.state?.checkoutData) {
+      sessionStorage.setItem(
+        "checkoutData",
+        JSON.stringify(location.state.checkoutData),
+      );
+      return;
+    }
+
     if (location.state?.checkoutItem) {
+      const data = {
+        source: "buy-now",
+        items: [location.state.checkoutItem],
+      };
+
+      sessionStorage.setItem("checkoutData", JSON.stringify(data));
       sessionStorage.setItem(
         "checkoutItem",
         JSON.stringify(location.state.checkoutItem),
@@ -59,12 +86,22 @@ const Checkout = () => {
   }, [location.state]);
 
   const totalAmount = useMemo(() => {
-    return Number(checkoutItem?.price || 0) * Number(checkoutItem?.qty || 1);
-  }, [checkoutItem]);
+    return checkoutItems.reduce(
+      (total, item) => total + Number(item.price || 0) * Number(item.qty || 1),
+      0,
+    );
+  }, [checkoutItems]);
+
+  const totalQty = useMemo(() => {
+    return checkoutItems.reduce(
+      (total, item) => total + Number(item.qty || 1),
+      0,
+    );
+  }, [checkoutItems]);
 
   const placeOrderHandler = async () => {
-    if (!checkoutItem) {
-      toast.error("No product selected for checkout.");
+    if (checkoutItems.length === 0) {
+      toast.error("No items selected for checkout.");
       return;
     }
 
@@ -73,21 +110,35 @@ const Checkout = () => {
     try {
       const data = await createOrder(
         {
-          products: [
-            {
-              productId: checkoutItem.productId,
-              name: checkoutItem.name,
-              price: checkoutItem.price,
-              qty: checkoutItem.qty,
-            },
-          ],
+          products: checkoutItems.map((item) => ({
+            productId: item.productId,
+            name: item.name,
+            price: item.price,
+            qty: item.qty,
+          })),
           totalAmount,
         },
         userInfo.token,
       );
 
       setOrder(data);
+      if (isCartCheckout) {
+        await Promise.allSettled(
+          checkoutItems
+            .filter((item) => item.cartItemId)
+            .map((item) =>
+              dispatch(
+                deleteCartItem({
+                  id: item.cartItemId,
+                  token: userInfo.token,
+                }),
+              ).unwrap(),
+            ),
+        );
+      }
+
       navigate("/my-orders");
+      sessionStorage.removeItem("checkoutData");
       sessionStorage.removeItem("checkoutItem");
       toast.success("Order placed successfully.");
     } catch (error) {
@@ -97,7 +148,7 @@ const Checkout = () => {
     }
   };
 
-  if (!checkoutItem) {
+  if (checkoutItems.length === 0) {
     return null;
   }
 
@@ -111,33 +162,41 @@ const Checkout = () => {
             </p>
             <h1 className="mt-3 text-4xl font-black">Cash on Delivery</h1>
             <p className="mt-3 max-w-2xl text-slate-300">
-              Review your product and place the order. Payment will be collected
+              Review your items and place the order. Payment will be collected
               when your order is delivered.
             </p>
           </div>
 
-          <div className="p-6">
-            <div className="grid gap-5 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950 sm:grid-cols-[140px_minmax(0,1fr)]">
-              <img
-                src={checkoutItem.image}
-                alt={checkoutItem.name}
-                className="h-40 w-full rounded-xl object-cover sm:h-36 sm:w-36"
-              />
+          <div className="space-y-4 p-6">
+            <div className="grid gap-4">
+              {checkoutItems.map((item) => (
+                <div
+                  key={item.cartItemId || item.productId}
+                  className="grid gap-5 rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-950 sm:grid-cols-[120px_minmax(0,1fr)_auto] sm:items-center"
+                >
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="h-36 w-full rounded-xl object-cover sm:h-28 sm:w-28"
+                  />
 
-              <div className="min-w-0">
-                <p className="text-xs font-black uppercase tracking-widest text-rose-600 dark:text-rose-300">
-                  {checkoutItem.category || "Selected product"}
-                </p>
-                <h2 className="mt-2 text-2xl font-black text-slate-950 dark:text-white">
-                  {checkoutItem.name}
-                </h2>
-                <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
-                  Quantity: {checkoutItem.qty}
-                </p>
-                <p className="mt-3 text-3xl font-black text-rose-600 dark:text-rose-300">
-                  Rs. {totalAmount}
-                </p>
-              </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-black uppercase tracking-widest text-rose-600 dark:text-rose-300">
+                      {item.category || "Selected item"}
+                    </p>
+                    <h2 className="mt-2 text-2xl font-black text-slate-950 dark:text-white">
+                      {item.name}
+                    </h2>
+                    <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+                      Quantity: {item.qty} x Rs. {item.price}
+                    </p>
+                  </div>
+
+                  <p className="text-2xl font-black text-rose-600 dark:text-rose-300">
+                    Rs. {Number(item.price || 0) * Number(item.qty || 1)}
+                  </p>
+                </div>
+              ))}
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -153,10 +212,12 @@ const Checkout = () => {
               <div className="rounded-2xl border border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
                 <FaBoxOpen className="text-2xl text-rose-600 dark:text-rose-300" />
                 <h3 className="mt-3 font-black text-slate-950 dark:text-white">
-                  Single Item
+                  {isCartCheckout ? "Cart Order" : "Buy Now"}
                 </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  This order is created from Buy Now.
+                  {isCartCheckout
+                    ? "All selected cart items are included."
+                    : "This order is created from Buy Now."}
                 </p>
               </div>
               <div className="rounded-2xl border border-slate-100 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
@@ -179,14 +240,14 @@ const Checkout = () => {
 
           <div className="mt-6 space-y-4 text-sm font-semibold text-slate-600 dark:text-slate-400">
             <div className="flex justify-between">
-              <span>Product</span>
+              <span>Items</span>
               <span className="text-right text-slate-950 dark:text-white">
-                {checkoutItem.name}
+                {checkoutItems.length}
               </span>
             </div>
             <div className="flex justify-between">
-              <span>Quantity</span>
-              <span>{checkoutItem.qty}</span>
+              <span>Total Quantity</span>
+              <span>{totalQty}</span>
             </div>
             <div className="flex justify-between">
               <span>Payment</span>

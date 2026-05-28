@@ -1,6 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { FaArrowLeft, FaLock, FaShoppingBag, FaTrash } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaArrowLeft,
+  FaLock,
+  FaMoneyBillWave,
+  FaShoppingBag,
+  FaTrash,
+} from "react-icons/fa";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
@@ -17,6 +23,12 @@ const getCartItemProduct = (item) =>
 
 const getCartItemQty = (item) => Number(item?.qty ?? item?.quantity ?? 1);
 
+const getCartItemProductId = (item) => {
+  const product = item?.product || item?.productId;
+
+  return product?._id || product?.id || product;
+};
+
 const getCartItemPrice = (item) => {
   const product = getCartItemProduct(item);
 
@@ -25,6 +37,7 @@ const getCartItemPrice = (item) => {
 
 const Cart = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { cartItems, loading, error } = useSelector((state) => state.cart);
   const { userInfo } = useSelector((state) => state.auth);
@@ -53,6 +66,47 @@ const Cart = () => {
     } catch (error) {
       toast.error(error || "Unable to remove item from cart.");
     }
+  };
+
+  const checkoutAllHandler = () => {
+    if (!userInfo?.token) {
+      toast.error("Please login to checkout.");
+      return;
+    }
+
+    const checkoutItems = cartItems
+      .map((item) => {
+        const product = getCartItemProduct(item);
+        const productId = getCartItemProductId(item);
+
+        if (!product || !productId) {
+          return null;
+        }
+
+        return {
+          cartItemId: getCartItemId(item),
+          productId,
+          name: product.title,
+          price: getCartItemPrice(item),
+          qty: getCartItemQty(item),
+          image: product.image,
+          category: product.category,
+        };
+      })
+      .filter(Boolean);
+
+    if (checkoutItems.length === 0) {
+      toast.error("No valid cart items available for checkout.");
+      return;
+    }
+
+    const checkoutData = {
+      source: "cart",
+      items: checkoutItems,
+    };
+
+    sessionStorage.setItem("checkoutData", JSON.stringify(checkoutData));
+    navigate("/checkout", { state: { checkoutData } });
   };
 
   const totalPrice = cartItems.reduce(
@@ -225,11 +279,16 @@ const Cart = () => {
               </div>
               <button
                 type="button"
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-3 text-sm font-bold text-white transition hover:bg-rose-700 dark:bg-rose-600 dark:hover:bg-rose-500"
+                onClick={checkoutAllHandler}
+                className="mt-6 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-rose-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-rose-500"
               >
-                <FaLock className="text-xs" />
-                Checkout
+                <FaMoneyBillWave className="text-xs" />
+                Buy All Items
               </button>
+              <p className="mt-3 flex items-center justify-center gap-2 text-xs font-bold text-slate-500 dark:text-slate-400">
+                <FaLock className="text-xs" />
+                Cash on Delivery checkout
+              </p>
               <Link
                 to="/shop"
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-slate-200 px-6 py-3 text-sm font-bold text-slate-700 transition hover:border-rose-300 hover:text-rose-600 dark:border-slate-700 dark:text-slate-300 dark:hover:border-rose-500 dark:hover:text-rose-300"

@@ -78,9 +78,14 @@ const ProductDetails = () => {
       image: product.image,
       category: product.category,
     };
+    const checkoutData = {
+      source: "buy-now",
+      items: [checkoutItem],
+    };
 
+    sessionStorage.setItem("checkoutData", JSON.stringify(checkoutData));
     sessionStorage.setItem("checkoutItem", JSON.stringify(checkoutItem));
-    navigate("/checkout", { state: { checkoutItem } });
+    navigate("/checkout", { state: { checkoutData } });
   };
 
   if (loading) {
