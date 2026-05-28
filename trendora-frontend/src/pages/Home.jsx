@@ -99,6 +99,19 @@ const Home = () => {
     setEmail("");
   };
 
+  if (loading) {
+    return (
+      <div className="flex min-h-[calc(100vh-88px)] items-center justify-center bg-gradient-to-br from-rose-50 via-white to-emerald-50 px-5 transition-colors dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950">
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/80 bg-white/90 px-10 py-8 shadow-2xl shadow-rose-100 dark:border-slate-700 dark:bg-slate-900/95 dark:shadow-slate-950">
+          <FaSpinner className="animate-spin text-5xl text-rose-600 dark:text-rose-400" />
+          <p className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            Loading Trendora
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-slate-950">
       <section className="relative overflow-hidden bg-slate-950 px-5 py-16 text-white md:px-10 lg:py-20">
@@ -177,11 +190,7 @@ const Home = () => {
             </Link>
           </div>
 
-          {loading ? (
-            <div className="flex min-h-72 items-center justify-center rounded-2xl border border-rose-100 bg-rose-50/70 dark:border-slate-800 dark:bg-slate-900">
-              <FaSpinner className="animate-spin text-5xl text-rose-600 dark:text-rose-400" />
-            </div>
-          ) : products.length === 0 ? (
+          {products.length === 0 ? (
             <div className="flex min-h-72 items-center justify-center rounded-2xl border border-dashed border-slate-300 text-center dark:border-slate-700">
               <p className="text-lg font-bold text-slate-600 dark:text-slate-300">
                 Featured products will appear here soon.

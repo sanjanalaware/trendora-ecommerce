@@ -8,7 +8,6 @@ import {
   FaFacebookF,
   FaInstagram,
   FaMapMarkerAlt,
-  FaPhoneAlt,
   FaPinterestP,
   FaTwitter,
 } from "react-icons/fa";
