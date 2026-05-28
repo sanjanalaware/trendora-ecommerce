@@ -18,3 +18,25 @@ export const getMyOrders = async (token) => {
 
   return response.data;
 };
+export const getAllOrders = async (token) => {
+  const response = await API.get("/orders", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+export const updateOrderStatus = async (id, status, token) => {
+  const response = await API.put(
+    `/orders/${id}`,
+    { status },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  return response.data;
+};
