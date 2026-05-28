@@ -50,6 +50,7 @@ export const registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      isAdmin: user.isAdmin,
       token: createToken(user._id),
     });
   } catch (error) {
@@ -77,6 +78,7 @@ export const loginUser = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
+        isAdmin: user.isAdmin,
         token: createToken(user._id),
       });
     } else {
