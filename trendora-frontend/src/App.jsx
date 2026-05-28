@@ -13,9 +13,10 @@ import Shop from "./pages/Shop";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
-import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
-
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminRoute from "./components/admin/AdminRoute";
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -27,6 +28,9 @@ const ScrollToTop = () => {
 };
 
 function App() {
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith("/admin");
+
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
 
@@ -75,7 +79,9 @@ function App() {
         }}
       />
 
-      <Navbar isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
+      {!isAdminRoute && (
+        <Navbar isDarkMode={isDarkMode} onToggleTheme={toggleTheme} />
+      )}
       <ScrollToTop />
 
       <Routes>
@@ -93,11 +99,19 @@ function App() {
 
         <Route path="/wishlist" element={<Wishlist />} />
 
-        <Route path="/admin" element={<AdminDashboard />} />
-
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout>
+                <AdminDashboard />
+              </AdminLayout>
+            </AdminRoute>
+          }
+        />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <Footer />
+      {!isAdminRoute && <Footer />}
     </div>
   );
 }
