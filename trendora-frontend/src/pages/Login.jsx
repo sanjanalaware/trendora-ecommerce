@@ -46,13 +46,18 @@ const Login = () => {
       dispatch(setCredentials(data));
 
       toast.success("Logged in successfully.");
-      navigate("/");
+
+      if (data.isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
-      setIsSubmitting(false);
       toast.error(error.response?.data?.message || "Invalid credentials.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
   return (
     <div className="flex min-h-[calc(100vh-88px)] items-center justify-center bg-gradient-to-br from-rose-50 via-white to-emerald-50 px-5 transition-colors dark:from-slate-950 dark:via-slate-900 dark:to-emerald-950">
       <form
@@ -98,10 +103,10 @@ const Login = () => {
             className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-12 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-rose-400 focus:bg-white focus:ring-4 focus:ring-rose-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-rose-500 dark:focus:bg-slate-800 dark:focus:ring-rose-950"
           />
           <button
-          type="button"
-          onClick={() => setShowPassword((value) => !value)}
-          disabled={isSubmitting}
-          className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-500 transition hover:bg-rose-50 hover:text-rose-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-rose-300"
+            type="button"
+            onClick={() => setShowPassword((value) => !value)}
+            disabled={isSubmitting}
+            className="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-500 transition hover:bg-rose-50 hover:text-rose-700 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-rose-300"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}

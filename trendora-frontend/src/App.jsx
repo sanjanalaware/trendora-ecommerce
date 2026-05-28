@@ -15,8 +15,11 @@ import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import NotFound from "./pages/NotFound";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminProducts from "./pages/admin/AdminProducts";
+import AddProduct from "./pages/admin/AddProduct";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminRoute from "./components/admin/AdminRoute";
+
 const ScrollToTop = () => {
   const { pathname } = useLocation();
 
@@ -26,6 +29,12 @@ const ScrollToTop = () => {
 
   return null;
 };
+
+const AdminPage = ({ children }) => (
+  <AdminRoute>
+    <AdminLayout>{children}</AdminLayout>
+  </AdminRoute>
+);
 
 function App() {
   const location = useLocation();
@@ -102,11 +111,25 @@ function App() {
         <Route
           path="/admin"
           element={
-            <AdminRoute>
-              <AdminLayout>
-                <AdminDashboard />
-              </AdminLayout>
-            </AdminRoute>
+            <AdminPage>
+              <AdminDashboard />
+            </AdminPage>
+          }
+        />
+        <Route
+          path="/admin/products"
+          element={
+            <AdminPage>
+              <AdminProducts />
+            </AdminPage>
+          }
+        />
+        <Route
+          path="/admin/add-product"
+          element={
+            <AdminPage>
+              <AddProduct />
+            </AdminPage>
           }
         />
         <Route path="*" element={<NotFound />} />
