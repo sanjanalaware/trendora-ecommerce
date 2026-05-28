@@ -131,7 +131,7 @@ const Navbar = ({ isDarkMode, onToggleTheme }) => {
           <button
             type="button"
             onClick={() => setIsMenuOpen((current) => !current)}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-rose-100 bg-white text-slate-800 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 md:hidden"
+            className="cursor-pointer flex h-11 w-11 items-center justify-center rounded-full border border-rose-100 bg-white text-slate-800 shadow-sm transition hover:border-rose-200 hover:bg-rose-50 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-800 md:hidden"
             aria-label={
               isMenuOpen ? "Close navigation menu" : "Open navigation menu"
             }
